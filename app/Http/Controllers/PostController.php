@@ -13,6 +13,10 @@ class PostController extends Controller
      */
     public function index()
     {
+        // PARA SACAR 3 NOTICIAS POR PAGINA PAGINACION ECHA SOLO ESTO
+        // $posts = Post::paginate(3);
+        // return view('post.index', compact('posts'));
+
         $posts = Post::orderBy('id', 'desc')->get();
         return view('post.index', [
             'posts' => $posts
@@ -75,7 +79,7 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //retorna de view de vista blade de un post
+        return view('post.edit', ['post' => $post]);
     }
 
     /**
@@ -83,7 +87,19 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //validate y try catch con update
+        $validated = $request->validate([
+            'entrada' => 'required|min:60|max:250|unique:post,entrada,' . $post->id,
+            'texto'   => 'required|min:100',
+            'titulo'  => 'required|min:25|max:60|unique:post,titulo,' . $post->id,
+        ]);
+
+        $post->update([
+            'entrada' => $request->input('entrada'),
+            'texto'   => strip_tags($request->input('texto'), env('PERMITTED_TAGS', '')),
+            'titulo'  => $request->input('titulo'),
+        ]);
+
+        return redirect()->route('post.show', $post->id)->with('success', 'La noticia se ha actualizado correctamente.');
     }
 
     /**
@@ -91,6 +107,12 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //try catch con delete
+        // Eliminar los comentarios asociados
+        $post->comments()->delete();
+
+        // Eliminar la noticia
+        $post->delete();
+
+        return redirect()->route('post.index')->with('success', 'Noticia eliminada correctamente.');
     }
 }

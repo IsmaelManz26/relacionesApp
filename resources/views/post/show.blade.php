@@ -1,6 +1,22 @@
 @extends('base')
 
 @section('content')
+
+@if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
+
+<div class="d-flex justify-content-end mb-3">
+    <a href="{{ route('post.edit', $post->id) }}" class="btn btn-sm btn-primary me-2">Editar</a>
+    <form action="{{ route('post.destroy', $post->id) }}" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta noticia?');">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="btn btn-sm btn-danger">Borrar</button>
+    </form>
+</div>
+
 {!! strip_tags($post->texto, env('PERMITTED_TAGS')) !!}
 
 <hr>
