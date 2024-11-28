@@ -13,11 +13,8 @@ class PostController extends Controller
      */
     public function index()
     {
-        // PARA SACAR 3 NOTICIAS POR PAGINA PAGINACION ECHA SOLO ESTO
-        // $posts = Post::paginate(3);
-        // return view('post.index', compact('posts'));
-
-        $posts = Post::orderBy('id', 'desc')->get();
+        //$posts = Post::orderBy('id', 'desc')->get();
+        $posts = Post::orderBy('id', 'desc')->paginate(3);
         return view('post.index', [
             'posts' => $posts
         ]);
